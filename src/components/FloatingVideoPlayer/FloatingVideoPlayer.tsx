@@ -13,8 +13,9 @@ import { WebView } from 'react-native-webview';
 import { openExternalLink } from '../../services/deepLink.service';
 import { colors } from '../../theme/colors';
 import {
-  buildYouTubeEmbedUrl,
+  buildYouTubeEmbedHtml,
   extractYouTubeVideoId,
+  YOUTUBE_BASE_URL,
 } from '../../utils/youtube.utils';
 import {
   EDGE_MARGIN,
@@ -48,8 +49,8 @@ const FloatingVideoPlayer: React.FC<FloatingVideoPlayerProps> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   const videoId = useMemo(() => extractYouTubeVideoId(videoUrl), [videoUrl]);
-  const embedUrl = useMemo(
-    () => (videoId ? buildYouTubeEmbedUrl(videoId) : null),
+  const embedHtml = useMemo(
+    () => (videoId ? buildYouTubeEmbedHtml(videoId) : null),
     [videoId],
   );
 
@@ -152,12 +153,15 @@ const FloatingVideoPlayer: React.FC<FloatingVideoPlayerProps> = ({
       </View>
 
       <View style={styles.videoArea}>
-        {embedUrl ? (
+        {embedHtml ? (
           <>
             <WebView
-              source={{ uri: embedUrl }}
+              // Our own page + a non-youtube.com baseUrl, not the embed URL
+              // directly. That combination is what avoids YouTube's error
+              // 153 and 152. See youtube.utils.ts for the full explanation.
+              source={{ html: embedHtml, baseUrl: YOUTUBE_BASE_URL }}
               style={styles.webView}
-              originWhitelist={['https://*']}
+              originWhitelist={['*']}
               javaScriptEnabled
               domStorageEnabled
               // Keeps the video inside this little box on iOS instead of

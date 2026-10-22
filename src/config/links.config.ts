@@ -26,7 +26,7 @@ export const DEEP_LINKS: LinkItem[] = [
     id: 'youtube-video',
     label: 'Preview YouTube Video',
     description: 'Plays here in a floating mini player you can drag around',
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    url: 'https://www.youtube.com/watch?v=7wtfhZwyrcc',
     openMode: 'inAppPreview',
     accentColor: colors.youtube,
   },
