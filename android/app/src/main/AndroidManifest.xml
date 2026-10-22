@@ -4,11 +4,15 @@
 
     <!--
       Android 11 (API 30) and above hide other installed apps from us by
-      default. Without this block, Linking.canOpenURL() always returns false
-      and the Amazon / Flipkart buttons would look broken.
+      default. This block makes every app that handles a web link visible to
+      us - verified on an API 35 device, where it is exactly what lets us see
+      Chrome.
 
       We are only asking "which app can open a web link?" - we are not
       listing or reading other apps.
+
+      IMPORTANT: this is native config, so it only takes effect after a full
+      rebuild (npm run android). Reloading JS from Metro will NOT apply it.
     -->
     <queries>
       <intent>
