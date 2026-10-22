@@ -2,6 +2,25 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!--
+      Android 11 (API 30) and above hide other installed apps from us by
+      default. Without this block, Linking.canOpenURL() always returns false
+      and the Amazon / Flipkart buttons would look broken.
+
+      We are only asking "which app can open a web link?" - we are not
+      listing or reading other apps.
+    -->
+    <queries>
+      <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="https" />
+      </intent>
+      <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="http" />
+      </intent>
+    </queries>
+
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"

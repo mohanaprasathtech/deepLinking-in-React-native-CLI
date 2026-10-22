@@ -24,6 +24,20 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<!--
+	  iOS blocks canOpenURL() for any scheme that is not listed here.
+	  https/http cover the Amazon and Flipkart web links; the app-specific
+	  schemes let iOS jump straight into those apps when they are installed.
+	-->
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>com.amazon.mobile.shopping</string>
+		<string>flipkart</string>
+		<string>youtube</string>
+		<string>vnd.youtube</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
