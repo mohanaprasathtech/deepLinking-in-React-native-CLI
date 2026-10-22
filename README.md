@@ -1,12 +1,12 @@
 # DeepLink
 
-A small React Native app with **three buttons**. Two of them send you out to another app, and one keeps you inside and plays a video in a little floating window.
+A small React Native app with **three cards**. Two of them send you out to another app, and one keeps you inside and plays a video in a little floating window.
 
-| Button | What happens when you tap it |
+| Card | What happens when you tap it |
 | --- | --- |
-| **Open Amazon Product** | Leaves the app and opens the product in the Amazon app. No Amazon app? It opens in the browser instead. |
-| **Open Flipkart Product** | Same idea — opens in the Flipkart app, or the browser if Flipkart is not installed. |
-| **Preview YouTube Video** | Stays in the app. A small video window pops up that you can **drag anywhere**, just like the mini video player in WhatsApp. |
+| **Amazon Product** | Leaves the app and opens the product in the Amazon app. No Amazon app? It opens in the browser instead. |
+| **Flipkart Product** | Same idea — opens in the Flipkart app, or the browser if Flipkart is not installed. |
+| **YouTube Video** | Stays in the app. A small video window pops up that you can **drag anywhere**, just like the mini video player in WhatsApp. |
 
 ---
 
@@ -14,11 +14,13 @@ A small React Native app with **three buttons**. Two of them send you out to ano
 
 ### 1. The main screen
 
-Three buttons in the middle of the screen. Each one shows its name, a short hint, and the real link it will open — so you always know where you are about to go.
+Three cards, each with its own brand colour. A card shows the category, the name, a short hint, and the real link it will open — so you always know where you are about to go.
 
-![Main screen with three buttons](docs/screenshots/01-home-screen.png)
+The cards slide up one after another when the screen opens, and squash slightly when you press them. The soft orange and blue light in the corners is drawn by hand (see [A glow without a gradient library](#a-glow-without-a-gradient-library) below).
 
-### 2. After tapping "Open Amazon Product"
+![Main screen with three link cards](docs/screenshots/01-home-screen.png)
+
+### 2. After tapping the Amazon card
 
 The app hands the link to the phone, and the phone opens the product page.
 
@@ -29,9 +31,9 @@ Notice the address bar: we tapped the short link `https://amzn.in/d/04klmfqB`, a
 > **Why does this screenshot show a browser and not the Amazon app?**
 > These screenshots were taken on an Android emulator, which does not have the Amazon or Flipkart apps installed. On a real phone that **has** those apps, the same tap opens the app directly instead of the browser. Both results are correct — the phone picks whichever is available.
 
-### 3. After tapping "Preview YouTube Video"
+### 3. After tapping the YouTube card
 
-This one is different — **you never leave the app**. A small video window appears at the bottom and starts playing straight away. The three buttons stay right where they are, and you can still use them.
+This one is different — **you never leave the app**. A small video window appears at the bottom and starts playing straight away. The three cards stay right where they are, and you can still use them.
 
 ![Floating YouTube mini player playing inside the app](docs/screenshots/03-youtube-floating-player.png)
 
@@ -90,7 +92,8 @@ src/
 ├── utils/
 │   └── youtube.utils.ts                  reads the video id out of a YouTube link
 ├── components/
-│   ├── LinkButton/                       one coloured button
+│   ├── LinkCard/                         one card in the list
+│   ├── GlowOrb/                          the soft background light
 │   └── FloatingVideoPlayer/              the draggable mini video window
 └── screens/
     └── HomeScreen/                       the main screen
@@ -98,18 +101,21 @@ src/
 docs/screenshots/                         the images used in this README
 ```
 
-### Want to change a link or add a fourth button?
+### Want to change a link or add a fourth card?
 
 Everything is in **one file**: `src/config/links.config.ts`. Edit the `url`, or copy one block and change it. The screen builds itself from this list, so you do not need to touch any UI code.
 
 ```ts
 {
   id: 'amazon-product',
-  label: 'Open Amazon Product',
-  description: 'Opens in the Amazon app (or browser if not installed)',
+  label: 'Amazon Product',                  // big title on the card
+  description: 'Jumps into the Amazon app', // small line under it
   url: 'https://amzn.in/d/04klmfqB',
-  openMode: 'external',        // 'external' = leave the app
-  accentColor: colors.amazon,  // 'inAppPreview' = floating video player
+  openMode: 'external',                     // 'external'     = leave the app
+                                            // 'inAppPreview' = floating player
+  accentColor: colors.amazon,               // tile colour + glow
+  icon: 'a',                                // glyph inside the tile
+  category: 'Shopping',                     // tiny label above the title
 }
 ```
 
@@ -129,14 +135,32 @@ The phone then checks which installed app has claimed that website address. Amaz
 
 ### Staying in the app (YouTube)
 
-Tapping the YouTube button does **not** leave the app. Instead it shows a small window on top of the screen that plays the video.
+Tapping the YouTube card does **not** leave the app. Instead it shows a small window on top of the screen that plays the video.
 
 - **Drag it** anywhere with your finger. It will not slide off the screen edges.
 - **Tap ↗** to jump to the full YouTube app.
 - **Tap ✕** to close it.
-- The buttons behind it still work while the video plays.
+- The cards behind it still work while the video plays.
 
 Inside, the window is a `WebView` (a tiny built-in browser) showing YouTube's embedded player. Getting that player to actually start took two tries — see [the YouTube notes](#the-video-would-not-play--error-153-then-error-152) at the bottom.
+
+---
+
+## How the look is built
+
+Everything on this screen is plain React Native — no UI kit, no gradient or blur library.
+
+### Cards that slide in
+
+Each card fades in and slides up, one shortly after the one above it, using `Animated` with `delay: 120 + index * 90`. Pressing a card springs it down to 97% size and back. Both run on the native driver, so they stay smooth even while the video is playing.
+
+### A glow without a gradient library
+
+The soft orange and blue light in the corners looks like a blurred gradient, but React Native has neither blur nor radial gradients built in. `src/components/GlowOrb/GlowOrb.tsx` fakes it:
+
+> Stack many circles of the same colour inside each other, each one slightly smaller and **very** transparent. In the middle lots of circles overlap, so the colour builds up and looks bright. Near the edge only one circle is left, so it fades away.
+
+The number of layers matters. The first version used 7 fat layers and you could clearly see each circle's edge, like ripples in water. Using 28 thin layers instead (`layerOpacity: 0.009`) makes each step too small to notice, and it reads as a smooth glow.
 
 ---
 

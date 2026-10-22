@@ -23,8 +23,12 @@ export interface LinkItem {
   url: string;
   /** Decides whether we leave the app or show the floating preview. */
   openMode: LinkOpenMode;
-  /** Button background colour. */
+  /** Brand colour used for the icon tile and the glow behind the card. */
   accentColor: string;
+  /** Short glyph shown in the coloured tile, e.g. 'a' or '▶'. */
+  icon: string;
+  /** Tiny label above the title, e.g. 'SHOPPING'. */
+  category: string;
 }
 
 /** Result of trying to open a link outside the app. */
